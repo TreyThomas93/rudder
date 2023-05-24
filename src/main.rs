@@ -108,7 +108,7 @@ fn add_feature(feature_name: &str, sub_feature_name: Option<&str>) {
 
         match layer {
             "application" => {
-                create_file(&path, &format!("{}_service.dart", feature_name), None);
+                create_file(&path, &format!("{}_service.dart", feature_name), Some(application_service(feature_name)));
             }
             "data" => {
                 create_file(&path, &format!("{}_local_repository.dart", feature_name), Some(local_repository(feature_name)));
@@ -124,7 +124,7 @@ fn add_feature(feature_name: &str, sub_feature_name: Option<&str>) {
 
                 create_folder(format!("{}\\controllers", &path).as_str());
 
-                create_file(&path, &format!("controllers\\{}_controller.dart", feature_name), None);
+                create_file(&path, &format!("controllers\\{}_controller.dart", feature_name), Some(controller(feature_name)));
             }
             _ => (),
         }

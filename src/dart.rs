@@ -18,9 +18,11 @@ pub fn stateless_widget(feature_name: &str) -> String {
     return format!(
         "
         import 'package:flutter/material.dart';
+        import 'package:auto_route/auto_route.dart';
 
-        class {feature_name} extends StatelessWidget {{
-            const {feature_name}({{Key? key}}) : super(key: key);
+        @RoutePage()
+        class {feature_name}Screen extends StatelessWidget {{
+            const {feature_name}Screen({{Key? key}}) : super(key: key);
 
             @override
             Widget build(BuildContext context) {{
@@ -44,15 +46,17 @@ pub fn stateless_widget(feature_name: &str) -> String {
 //     return format!(
 //         "
 //         import 'package:flutter/material.dart';
+//         import 'package:auto_route/auto_route.dart';
 
-//         class {feature_name} extends StatefulWidget {{
-//             const {feature_name}({{Key? key}}) : super(key: key);
+//         @RoutePage()
+//         class {feature_name}Screen extends StatefulWidget {{
+//             const {feature_name}Screen({{Key? key}}) : super(key: key);
 
 //             @override
-//             _{feature_name}State createState() => _{feature_name}State();
+//             _{feature_name}ScreenState createState() => _{feature_name}ScreenState();
 //         }}
 
-//         class _{feature_name}State extends State<{feature_name}> {{
+//         class _{feature_name}ScreenState extends State<{feature_name}Screen> {{
 //             @override
 //             Widget build(BuildContext context) {{
 //                 return Scaffold(
@@ -118,6 +122,56 @@ pub fn remote_repository(feature_name: &str) -> String {
 
         final {}RemoteRepositoryProvider = Provider<{feature_name}RemoteRepository>((ref) => {feature_name}RemoteRepository(ref));
         
+        ",
+        feature_name.to_lowercase()
+    ).trim().to_string();
+    }
+
+// application service
+pub fn application_service(feature_name: &str) -> String {
+    let feature_name = feature_name.to_string().capitalize();
+    return format!(
+        "
+        import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+        abstract class Abstract{feature_name}Service {{
+            Future<void> save();
+        }}
+
+        class {feature_name}Service implements Abstract{feature_name}ApplicationService {{
+            final Ref ref;
+
+            {feature_name}Service(this.ref);
+
+            @override
+            Future<void> save() async => throw UnimplementedError();
+        }}
+
+        final {}ServiceProvider = Provider<{feature_name}Service>((ref) => {feature_name}Service(ref));
+        
+        ",
+        feature_name.to_lowercase()
+    ).trim().to_string();
+    } 
+
+// controller
+pub fn controller(feature_name: &str) -> String {
+    let feature_name = feature_name.to_string().capitalize();
+    return format!(
+        "
+        import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+        class {feature_name}Controller  extends StateNotifier<bool> {{
+            final Ref ref;
+
+            {feature_name}Controller(this.ref) : super(true);
+
+            @override
+            Future<void> fetchSomething() async => throw UnimplementedError();
+        }}
+
+        final {}ControllerProvider = StateNotifierProvider.autoDispose<{feature_name}Controller, bool>((ref) => {feature_name}Controller(ref));
+            
         ",
         feature_name.to_lowercase()
     ).trim().to_string();
