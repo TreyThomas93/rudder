@@ -1,138 +1,138 @@
+
+/* 
+Basic folder structure for Flutter projects:
+- lib
+    - src
+        - features
+            - home
+                - application
+                    > home_service.dart
+                - data
+                    > remote_repository.dart
+                    > local_repository.dart
+                - domain
+                    > home_model.dart
+                    > home_union.dart
+                - presentation
+                    > home_screen.dart
+                    - controllers
+                        > home_controller.dart
+                    - sub_screens
+                        ...
+        - services
+            > *_service.dart
+        - utils
+            > theme.dart
+            > routes.dart
+            ...
+
+This is created when the following command is run: rudder create
+Must be in root of project folder to work correctly.
+
+Commands:
+rudder create - creates the basic folder structure for the project
+rudder add feature:[feature_name] - creates the folder structure for a feature
+
+Plan:
+- Add ability to create sub_features. (e.g. home -> home/sub_features/roster/sub_features/documents/...)
+- Add routes.dart to utils folder on create.
+- Update repo names to remote/local.
+- Add union file to domain folder.
+- Automatically add dart code to dart files.
+ */
+
+mod args;
+
+use args::{RudderArgs, RudderCommand};
+use clap::Parser;
 use std::fs::create_dir;
 use std::fs::File;
 use std::path::Path;
 
-// CLI tool for adding features for my Flutter projects or to create an entire folder structure for a new projects.
-// Must be in root of project folder to work correctly.
 
 fn main() {
-    // Check if lib folder found in root.
-    if Path::new("lib").exists() == false {
-        panic!(
-            "lib folder not found in root. Please run this command in the root of your project."
-        );
-    }
+    let args: RudderArgs = RudderArgs::parse();
 
-    let args = std::env::args().collect::<Vec<String>>();
-
-    if args.len() == 1 {
-        panic!("Missing arguments. Please provide a command and type.");
-    }
-
-    match args[1].as_str() {
-        "add" => {
-            let a = args.get(2);
-
-            if let Some(a) = a {
-                let m: Vec<&str> = a.split(":").map(|s| s).collect();
-
-                if m.len() != 2 {
-                    panic!("Invalid format");
-                }
-
-                match m[0] {
-                    "feature" => {
-                        if m[1].trim() == "" {
-                            panic!("Invalid feature name");
-                        }
-
-                        if m[1].trim().contains("\"") {
-                            panic!("Detected mulitple features. Try using features keyword instead.");
-                        }
-
-                        if Path::new(format!("lib/src/features/{}", m[1]).as_str()).exists() {
-                            panic!(
-                                "Feature already exists. Please choose a different name or delete the existing feature."
-                            );
-                        }
-
-                        println!("Adding features for {}...", m[1]);
-
-                        add_feature(m[1]);
-                    },
-                    "features" => {
-                        if m[1].trim() == "" {
-                            panic!("Invalid feature name");
-                        }
-
-                        let features = m[1].split(",").map(|s| s.trim()).collect::<Vec<&str>>();
-
-                        for feature in features.iter() {
-
-                            if Path::new(format!("lib/src/features/{}", feature).as_str()).exists() {
-                                println!(
-                                   "Feature {} already exists. Please choose a different name or delete the existing feature.", *feature
-                                );
-                                continue;
-                            }
-
-                            println!("Adding feature for {}...", *feature);
-
-                            add_feature(*feature);
-                        }
-
-                        
-                    }
-                    _ => println!("Unknown type"),
-                }
-            } else {
-                println!("Missing type");
-            }
-        }
-        "create" => {
+    match args.command {
+        RudderCommand::Create => {
             println!("Creating project structure...");
 
             create_project_structure();
         }
-        _ => println!("Unknown command"),
+        RudderCommand::Add(add_command) => {
+            
+
+            if let Some (sub_feature) = add_command.sub_feature {
+                println!("Adding sub feature {} to {}...", sub_feature, add_command.feature);
+                add_feature(add_command.feature.as_str(), Some(sub_feature.as_str()));
+                return;
+            }
+
+            println!("Adding {} feature...", add_command.feature);
+
+            add_feature(add_command.feature.as_str(), None);
+        }
     }
 }
 
-fn add_feature(feature_name: &str) {
+fn add_feature(feature_name: &str, sub_feature_name: Option<&str>) {
     let layers = ["application", "data", "domain", "presentation"];
 
-    let base_path = "lib\\src\\features";
+    let base_path = match sub_feature_name {
+        Some(sub_feature_name) => format!("lib\\src\\features\\{}\\sub_features\\{}", feature_name, sub_feature_name),
+        None => format!("lib\\src\\features\\{}", feature_name),
+    };
 
     // create [feature_name] folder
-    create_folder(format!("{base_path}\\{}", feature_name).as_str());
+    create_folder(&base_path);
+
+     // Create sub_features folder if doesnt exist
+    if !Path::new(format!("lib\\src\\features\\{}\\sub_features", feature_name).as_str()).exists() {
+        create_folder(format!("lib\\src\\features\\{}\\sub_features", feature_name).as_str());
+    }
+
+    let feature_name: &str = match sub_feature_name {
+        Some(sub_feature_name) => sub_feature_name,
+        None => feature_name,
+    }; 
 
     // create folders for layers
     for &layer in layers.iter() {
-        let path = format!("{base_path}\\{}\\{}", feature_name, layer);
+        let path = format!("{base_path}\\{}", layer);
 
         create_folder(&path);
 
-        let mut file_name = String::new();
-
         match layer {
             "application" => {
-                file_name = format!("{}_service.dart", feature_name);
+                create_file(&path, &format!("{}_service.dart", feature_name));
             }
             "data" => {
-                file_name = format!("{}_repository.dart", feature_name);
+                create_file(&path, &format!("{}_local_repository.dart", feature_name));
+                create_file(&path, &format!("{}_remote_repository.dart", feature_name));
             }
             "domain" => {
-                file_name = format!("{}_model.dart", feature_name);
+                create_file(&path, &format!("{}_models.dart", feature_name));
+                create_file(&path, &format!("{}_unions.dart", feature_name));
+                create_file(&path, &format!("{}_exceptions.dart", feature_name));
             }
             "presentation" => {
                 create_file(&path, format!("{}_screen.dart", feature_name).as_str());
 
                 create_folder(format!("{}\\controllers", &path).as_str());
 
-                file_name = format!("controllers\\{}_controller.dart", feature_name);
+                create_file(&path, &format!("controllers\\{}_controller.dart", feature_name));
             }
             _ => (),
         }
 
-        create_file(&path, &file_name);
+        
     }
 }
 
 fn create_project_structure() {
     if Path::new("lib/src").exists() {
-        panic!(
-            "src folder detected in lib folder. Panicking to prevent overwriting existing files."
-        );
+        println!("**lib/src folder already exists. Please delete the folder and try again.**");
+        return;
     }
 
     let root = "lib";
@@ -146,8 +146,11 @@ fn create_project_structure() {
     // create utils folder
     create_folder(format!("{}\\src\\utils", &root).as_str());
 
-    // create theme.dart file
+    // create theme.dart file for utils folder
     create_file(format!("{}\\src\\utils", &root).as_str(), "theme.dart");
+
+    // create routes.dart file for utils folder
+    create_file(format!("{}\\src\\utils", &root).as_str(), "routes.dart");
 
     // create services folder
     create_folder(format!("{}\\src\\services", &root).as_str());
@@ -158,11 +161,10 @@ fn create_project_structure() {
         "logger_service.dart",
     );
 
-    // create exceptions folder
-    create_folder(format!("{}\\src\\exceptions", &root).as_str());
-
     // add home feature
-    add_feature("home");
+    add_feature("home", None);
+
+    println!("Project structure created successfully!");
 }
 
 fn create_folder(path: &str) {
