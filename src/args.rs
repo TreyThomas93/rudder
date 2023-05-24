@@ -5,8 +5,13 @@ use clap::{
 };
 
 #[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
+#[command(name="Rudder", author="Trey Thomas", version="1.0.0", about="A program to generate project folder structures and features for Flutter apps.", long_about = None)]
+#[command(
+    help_template = "Name: {name}\nAuthor: {author}\nAbout: {about}\nVersion: {version}\n\n{usage-heading}\n{usage}\n\n{all-args}\n{tab}"
+)]
 pub struct RudderArgs{
+
+    /// Subcommand to execute.
     #[clap(subcommand)]
     pub command: RudderCommand,
 }

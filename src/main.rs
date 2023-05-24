@@ -42,12 +42,15 @@ Plan:
  */
 
 mod args;
+mod dart;
 
 use args::{RudderArgs, RudderCommand};
 use clap::Parser;
 use std::fs::create_dir;
 use std::fs::File;
 use std::path::Path;
+use std::io::Write;
+use dart::*;
 
 
 fn main() {
@@ -76,6 +79,7 @@ fn main() {
 }
 
 fn add_feature(feature_name: &str, sub_feature_name: Option<&str>) {
+
     let layers = ["application", "data", "domain", "presentation"];
 
     let base_path = match sub_feature_name {
@@ -104,23 +108,23 @@ fn add_feature(feature_name: &str, sub_feature_name: Option<&str>) {
 
         match layer {
             "application" => {
-                create_file(&path, &format!("{}_service.dart", feature_name));
+                create_file(&path, &format!("{}_service.dart", feature_name), None);
             }
             "data" => {
-                create_file(&path, &format!("{}_local_repository.dart", feature_name));
-                create_file(&path, &format!("{}_remote_repository.dart", feature_name));
+                create_file(&path, &format!("{}_local_repository.dart", feature_name), Some(local_repository(feature_name)));
+                create_file(&path, &format!("{}_remote_repository.dart", feature_name), Some(remote_repository(feature_name)));
             }
             "domain" => {
-                create_file(&path, &format!("{}_models.dart", feature_name));
-                create_file(&path, &format!("{}_unions.dart", feature_name));
-                create_file(&path, &format!("{}_exceptions.dart", feature_name));
+                create_file(&path, &format!("{}_models.dart", feature_name), None);
+                create_file(&path, &format!("{}_unions.dart", feature_name), None);
+                create_file(&path, &format!("{}_exceptions.dart", feature_name), None);
             }
             "presentation" => {
-                create_file(&path, format!("{}_screen.dart", feature_name).as_str());
+                create_file(&path, format!("{}_screen.dart", feature_name).as_str(), Some(stateless_widget(feature_name)));
 
                 create_folder(format!("{}\\controllers", &path).as_str());
 
-                create_file(&path, &format!("controllers\\{}_controller.dart", feature_name));
+                create_file(&path, &format!("controllers\\{}_controller.dart", feature_name), None);
             }
             _ => (),
         }
@@ -147,10 +151,10 @@ fn create_project_structure() {
     create_folder(format!("{}\\src\\utils", &root).as_str());
 
     // create theme.dart file for utils folder
-    create_file(format!("{}\\src\\utils", &root).as_str(), "theme.dart");
+    create_file(format!("{}\\src\\utils", &root).as_str(), "theme.dart", None);
 
     // create routes.dart file for utils folder
-    create_file(format!("{}\\src\\utils", &root).as_str(), "routes.dart");
+    create_file(format!("{}\\src\\utils", &root).as_str(), "routes.dart", None);
 
     // create services folder
     create_folder(format!("{}\\src\\services", &root).as_str());
@@ -159,6 +163,7 @@ fn create_project_structure() {
     create_file(
         format!("{}\\src\\services", &root).as_str(),
         "logger_service.dart",
+        None,
     );
 
     // add home feature
@@ -171,7 +176,12 @@ fn create_folder(path: &str) {
     create_dir(&path).expect(format!("Error creating folder: {}", &path).as_str());
 }
 
-fn create_file<'a>(path: &'a str, name: &'a str) {
-    File::create(format!("{}\\{}", &path, &name))
+fn create_file<'a>(path: &'a str, name: &'a str, data: Option<String>) {
+    let mut file = File::create(format!("{}\\{}", &path, &name))
         .expect(format!("Error creating file: {}/{}", &path, &name).as_str());
+
+    if let Some(data) = data {
+        // write to file
+        file.write_all(data.as_bytes()).expect("Error writing to file.");
+    }
 }
