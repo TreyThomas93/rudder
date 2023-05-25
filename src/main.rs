@@ -51,7 +51,7 @@ use std::fs::File;
 use std::path::Path;
 use std::io::Write;
 use dart::*;
-
+use std::process::Command;
 
 fn main() {
     let args: RudderArgs = RudderArgs::parse();
@@ -76,6 +76,8 @@ fn main() {
             add_feature(add_command.feature.as_str(), None);
         }
     }
+
+    add_dependencies();
 }
 
 fn add_feature(feature_name: &str, sub_feature_name: Option<&str>) {
@@ -213,4 +215,37 @@ fn create_file<'a>(path: &'a str, name: &'a str, data: Option<String>) {
         // write to file
         file.write_all(data.as_bytes()).expect("Error writing to file.");
     }
+}
+
+fn add_dependencies() {
+
+    let dependencies = format!("flutter pub add {}", ["auto_route", "flutter_riverpod", "logger", "responsive_framework", "intl", "flutter_dotenv"].join(" "));
+    let dev_dependencies = format!("flutter pub add --dev {}", ["build_runner", "auto_route_generator", "riverpod_lint"].join(" "));
+
+     if cfg!(target_os = "windows") {
+        println!("Installing dependencies...");
+        Command::new("cmd")
+                .args(["/C", &dependencies]).output().expect("Failed to install dependencies");
+        println!("Dependencies installed successfully!");
+
+        println!("Installing dev dependencies...");
+        Command::new("cmd")
+                .args(["/C", &dev_dependencies]).output().expect("Failed to install dev dependencies");   
+        println!("Dev dependencies installed successfully!");   
+    } else {
+
+        println!("Installing dependencies...");
+        Command::new("sh")
+                .arg("-c")
+                .arg(&dependencies)
+                .output().expect("Failed to install dependencies");
+        println!("Dependencies installed successfully!");
+
+        println!("Installing dev dependencies...");
+        Command::new("sh")
+                .arg("-c")
+                .arg(&dev_dependencies)
+                .output().expect("Failed to install dev dependencies");
+        println!("Dev dependencies installed successfully!");
+    };
 }

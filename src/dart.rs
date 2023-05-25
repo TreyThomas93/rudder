@@ -23,7 +23,7 @@ pub fn main_dart() -> String {
         import 'package:flutter_dotenv/flutter_dotenv.dart';
 
         import 'src/app.dart';
-        import 'src/services/logger.service.dart';
+        import 'src/services/logger_service.dart';
 
         void main() async {
             WidgetsFlutterBinding.ensureInitialized();
@@ -100,14 +100,12 @@ pub fn app_dart() -> String {
             State<MyApp> createState() => _MyAppState();
         }
 
-        class _MyAppState extends ConsumerState<MyApp> {
-            const MyApp({Key? key});
-
-            late final Routes _appRouter;
+        class _MyAppState extends State<MyApp> {
+            late final AppRouter _appRouter;
 
             @override
             void initState() {
-                _appRouter = Routes(ref);
+                _appRouter = AppRouter(ref);
                 super.initState();
             }
 
@@ -119,7 +117,7 @@ pub fn app_dart() -> String {
                     debugShowCheckedModeBanner: false,
                     theme: ThemeData(
                         useMaterial3: true,
-                        appBarTheme: const AppBarTheme(backgroundColor: fluent.Color.fromARGB(255, 80, 66, 105), centerTitle: true, toolbarHeight: 40, foregroundColor: Colors.white),
+                        appBarTheme: const AppBarTheme(backgroundColor: Color.fromARGB(255, 80, 66, 105), centerTitle: true, toolbarHeight: 40, foregroundColor: Colors.white),
                         elevatedButtonTheme: ElevatedButtonThemeData(
                         style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.white,
@@ -130,7 +128,7 @@ pub fn app_dart() -> String {
                         errorStyle: TextStyle(color: Colors.red, fontSize: 12.0, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
                         ),
                     ),
-                    routerConfig: appRouter.config(navigatorObservers: () => [MyRouteObserver()]),
+                    routerConfig: _appRouter.config(navigatorObservers: () => [MyRouteObserver()]),
                     builder: (context, child) => ResponsiveBreakpoints.builder(
                             child: child!,
                             breakpoints: [
@@ -162,7 +160,7 @@ pub fn routes_dart() -> String {
         class AppRouter extends $AppRouter implements AutoRouteGuard {
             final WidgetRef ref;
 
-            Routes(this.ref);
+            AppRouter(this.ref);
 
             @override
             RouteType get defaultRouteType => const RouteType.custom(
@@ -277,7 +275,7 @@ pub fn extensions_dart() -> String {
     return "
         extension StringExtension on String {
             String capitalize() {
-                return '${{this[0].toUpperCase()}}${{this.substring(1)}}';
+                return '${this[0].toUpperCase()}${this.substring(1)}';
             }
         }
     ".trim().to_string();
@@ -462,7 +460,7 @@ pub fn application_service(feature_name: &str) -> String {
             Future<void> save();
         }}
 
-        class {feature_name}Service implements Abstract{feature_name}ApplicationService {{
+        class {feature_name}Service implements Abstract{feature_name}Service {{
             final Ref ref;
 
             {feature_name}Service(this.ref);
