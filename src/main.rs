@@ -202,7 +202,12 @@ fn create_folder(path: &str) {
 }
 
 fn create_file<'a>(path: &'a str, name: &'a str, data: Option<String>) {
-    let mut file = match File::create(format!("{}\\{}", &path, &name)) {
+    
+    let merged = if path == "" { format!("{}", &name) } else { format!("{}\\{}", &path, &name) };
+    
+    println!("Adding {:}", merged);
+
+    let mut file = match File::create(&merged) {
         Ok(file) => file,
         Err(e) => {
             println!("Error creating file {name}: {}", e);
