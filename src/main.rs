@@ -140,8 +140,7 @@ fn add_feature(feature_name: &str, sub_feature_name: Option<&str>) {
 fn create_project_structure() {
     if !Path::new(".env").exists() {
         // create .env file in root
-        // todo uncomment this
-        // create_file("", ".env", None);
+        create_file("", ".env", None);
     }
 
     if Path::new("lib/src").exists() {
@@ -201,8 +200,14 @@ fn create_folder(path: &str) {
 }
 
 fn create_file<'a>(path: &'a str, name: &'a str, data: Option<String>) {
-    let mut file = File::create(format!("{}\\{}", &path, &name))
-        .expect(format!("Error creating file: {}/{}", &path, &name).as_str());
+    let mut file = match File::create(format!("{}\\{}", &path, &name)) {
+        Ok(file) => file,
+        Err(e) => {
+            println!("Error creating file {name}: {}", e);
+            return;
+        },
+    };
+        
 
     if let Some(data) = data {
         // write to file
