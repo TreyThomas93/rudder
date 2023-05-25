@@ -61,6 +61,10 @@ fn main() {
             println!("Creating project structure...");
 
             create_project_structure();
+
+            println!("Project structure created successfully!");
+
+            add_dependencies();
         }
         RudderCommand::Add(add_command) => {
             
@@ -68,16 +72,18 @@ fn main() {
             if let Some (sub_feature) = add_command.sub_feature {
                 println!("Adding sub feature {} to {}...", sub_feature, add_command.feature);
                 add_feature(add_command.feature.as_str(), Some(sub_feature.as_str()));
+                println!("Sub feature {} added successfully!", sub_feature);
                 return;
             }
 
             println!("Adding {} feature...", add_command.feature);
 
             add_feature(add_command.feature.as_str(), None);
+
+            println!("{} feature added successfully!", add_command.feature);
         }
     }
 
-    add_dependencies();
 }
 
 fn add_feature(feature_name: &str, sub_feature_name: Option<&str>) {
@@ -194,7 +200,6 @@ fn create_project_structure() {
     // add home feature
     add_feature("home", None);
 
-    println!("Project structure created successfully!");
 }
 
 fn create_folder(path: &str) {
