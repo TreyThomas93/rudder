@@ -113,6 +113,10 @@ fn add_feature(feature_name: &str, sub_feature_name: Option<&str>) {
             "data" => {
                 create_file(&path, &format!("{}_local_repository.dart", feature_name), Some(local_repository(feature_name)));
                 create_file(&path, &format!("{}_remote_repository.dart", feature_name), Some(remote_repository(feature_name)));
+
+                // fake repositories
+                create_file(&path, &format!("fake_{}_local_repository.dart", feature_name), Some(fake_local_repository(feature_name)));
+                create_file(&path, &format!("fake_{}_remote_repository.dart", feature_name), Some(fake_remote_repository(feature_name)));
             }
             "domain" => {
                 create_file(&path, &format!("{}_models.dart", feature_name), None);
@@ -134,15 +138,32 @@ fn add_feature(feature_name: &str, sub_feature_name: Option<&str>) {
 }
 
 fn create_project_structure() {
+    if !Path::new(".env").exists() {
+        // create .env file in root
+        // todo uncomment this
+        // create_file("", ".env", None);
+    }
+
     if Path::new("lib/src").exists() {
         println!("**lib/src folder already exists. Please delete the folder and try again.**");
         return;
     }
 
+    // delete main.dart file
+    if Path::new("lib/main.dart").exists() {
+        std::fs::remove_file("lib/main.dart").expect("Unable to delete main.dart file");
+    }
+
     let root = "lib";
+
+    // create main.dart file
+    create_file(root, "main.dart", Some(main_dart()));
 
     // create src folder
     create_folder(format!("{}\\src", &root).as_str());
+
+    // create app.dart file
+    create_file(format!("{}\\src", &root).as_str(), "app.dart", Some(app_dart()));
 
     // create features folder
     create_folder(format!("{}\\src\\features", &root).as_str());
@@ -154,7 +175,10 @@ fn create_project_structure() {
     create_file(format!("{}\\src\\utils", &root).as_str(), "theme.dart", None);
 
     // create routes.dart file for utils folder
-    create_file(format!("{}\\src\\utils", &root).as_str(), "routes.dart", None);
+    create_file(format!("{}\\src\\utils", &root).as_str(), "routes.dart", Some(routes_dart()));
+
+    // create an extension.dart file
+    create_file(format!("{}\\src\\utils", &root).as_str(), "extensions.dart", Some(extensions_dart()));
 
     // create services folder
     create_folder(format!("{}\\src\\services", &root).as_str());
@@ -163,7 +187,7 @@ fn create_project_structure() {
     create_file(
         format!("{}\\src\\services", &root).as_str(),
         "logger_service.dart",
-        None,
+        Some(logger_service()),
     );
 
     // add home feature
