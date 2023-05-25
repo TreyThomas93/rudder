@@ -27,11 +27,14 @@ pub enum RudderCommand {
 
 
 #[derive(Args, Debug)]
-#[group(required = true, multiple = true)]
 pub struct AddCommand {
-    /// Name of the feature to add. >> rudder add [feature_name].
+    // /// Name of the feature to add. >> rudder add [feature_name].
+    // #[clap(short, long)]
+    // pub feature: Option<String>,
+
+    /// Name of the features to add. >> rudder add [feature_name] [feature_name] ... 
     #[clap(short, long)]
-    pub feature: String,
+    pub features: String,
 
     /// Name of the sub feature to add. >> rudder add [feature_name] [sub_feature_name]
     #[clap(short, long)]

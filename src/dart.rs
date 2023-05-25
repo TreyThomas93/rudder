@@ -1,8 +1,9 @@
-pub trait Capitalize {
+pub trait StringTrait {
   fn capitalize(self) -> String;
+  fn to_pascal_case(self) -> String;
 }
 
-impl Capitalize for String {
+impl StringTrait for String {
   fn capitalize(self) -> String {
     let mut c = self.chars();
     match c.next() {
@@ -10,6 +11,22 @@ impl Capitalize for String {
       Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
     }
   }
+
+fn to_pascal_case(self) -> String {
+    let mut result = String::new();
+    let mut capitalize_next = true;
+    for c in self.chars() {
+      if c == '_' {
+        capitalize_next = true;
+      } else if capitalize_next {
+        result.push(c.to_ascii_uppercase());
+        capitalize_next = false;
+      } else {
+        result.push(c);
+      }
+    }
+    result
+    }
 }
 
 // main.dart
@@ -283,7 +300,7 @@ pub fn extensions_dart() -> String {
 
 // statless flutter widget
 pub fn stateless_widget(feature_name: &str) -> String {
-    let feature_name = feature_name.to_string().capitalize();
+    let feature_name = feature_name.to_string().to_pascal_case().capitalize();
     return format!(
         "
         import 'package:flutter/material.dart';
@@ -311,7 +328,7 @@ pub fn stateless_widget(feature_name: &str) -> String {
 
 // stateful flutter widget
 // pub fn stateful_widget(feature_name: &str) -> String {
-//     let feature_name = feature_name.to_string().capitalize();
+//     let feature_name = feature_name.to_string().to_pascal_case().capitalize();
 //     return format!(
 //         "
 //         import 'package:flutter/material.dart';
@@ -344,7 +361,7 @@ pub fn stateless_widget(feature_name: &str) -> String {
 
 // local repository
 pub fn local_repository(feature_name: &str) -> String {
-    let feature_name = feature_name.to_string().capitalize();
+    let feature_name = feature_name.to_string().to_pascal_case().capitalize();
     return format!(
         "
         import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -371,7 +388,7 @@ pub fn local_repository(feature_name: &str) -> String {
 
 // remote repository
 pub fn remote_repository(feature_name: &str) -> String {
-    let feature_name = feature_name.to_string().capitalize();
+    let feature_name = feature_name.to_string().to_pascal_case().capitalize();
     return format!(
         "
         import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -398,7 +415,7 @@ pub fn remote_repository(feature_name: &str) -> String {
 
 // local repository
 pub fn fake_local_repository(feature_name: &str) -> String {
-    let feature_name = feature_name.to_string().capitalize();
+    let feature_name = feature_name.to_string().to_pascal_case().capitalize();
     return format!(
         "
         import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -425,7 +442,7 @@ pub fn fake_local_repository(feature_name: &str) -> String {
 
 // remote repository
 pub fn fake_remote_repository(feature_name: &str) -> String {
-    let feature_name = feature_name.to_string().capitalize();
+    let feature_name = feature_name.to_string().to_pascal_case().capitalize();
     return format!(
         "
         import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -451,7 +468,7 @@ pub fn fake_remote_repository(feature_name: &str) -> String {
 
 // application service
 pub fn application_service(feature_name: &str) -> String {
-    let feature_name = feature_name.to_string().capitalize();
+    let feature_name = feature_name.to_string().to_pascal_case().capitalize();
     return format!(
         "
         import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -478,7 +495,7 @@ pub fn application_service(feature_name: &str) -> String {
 
 // controller
 pub fn controller(feature_name: &str) -> String {
-    let feature_name = feature_name.to_string().capitalize();
+    let feature_name = feature_name.to_string().to_pascal_case().capitalize();
     return format!(
         "
         import 'package:flutter_riverpod/flutter_riverpod.dart';

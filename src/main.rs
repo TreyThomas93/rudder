@@ -59,28 +59,29 @@ fn main() {
     match args.command {
         RudderCommand::Create => {
             println!("Creating project structure...");
-
             create_project_structure();
-
             println!("Project structure created successfully!");
-
             add_dependencies();
         }
         RudderCommand::Add(add_command) => {
             
 
+            // Add a sub feature to existing parent feature.
             if let Some (sub_feature) = add_command.sub_feature {
-                println!("Adding sub feature {} to {}...", sub_feature, add_command.feature);
-                add_feature(add_command.feature.as_str(), Some(sub_feature.as_str()));
-                println!("Sub feature {} added successfully!", sub_feature);
+                for feature in add_command.features.split(",") {
+                    println!("Adding sub feature {} to {}...", sub_feature, feature);
+                    add_feature(feature.trim(), Some(sub_feature.as_str()));
+                    println!("Sub feature {} added successfully!", sub_feature);
+                }
                 return;
             }
 
-            println!("Adding {} feature...", add_command.feature);
-
-            add_feature(add_command.feature.as_str(), None);
-
-            println!("{} feature added successfully!", add_command.feature);
+            // Add a feature.
+            for feature in add_command.features.split(",") {
+                println!("Adding {} feature...", feature);
+                add_feature(feature.trim(), None);
+                println!("{} feature added successfully!\n", feature);
+            }
         }
     }
 
@@ -133,9 +134,7 @@ fn add_feature(feature_name: &str, sub_feature_name: Option<&str>) {
             }
             "presentation" => {
                 create_file(&path, format!("{}_screen.dart", feature_name).as_str(), Some(stateless_widget(feature_name)));
-
                 create_folder(format!("{}\\controllers", &path).as_str());
-
                 create_file(&path, &format!("controllers\\{}_controller.dart", feature_name), Some(controller(feature_name)));
             }
             _ => (),
