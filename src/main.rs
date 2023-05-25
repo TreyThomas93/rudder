@@ -223,25 +223,25 @@ fn add_dependencies() {
     let dev_dependencies = format!("flutter pub add --dev {}", ["build_runner", "auto_route_generator", "riverpod_lint"].join(" "));
 
      if cfg!(target_os = "windows") {
-        println!("Installing dependencies...");
+        println!("\nInstalling dependencies...");
         Command::new("cmd")
                 .args(["/C", &dependencies]).output().expect("Failed to install dependencies");
         println!("Dependencies installed successfully!");
 
-        println!("Installing dev dependencies...");
+        println!("\nInstalling dev dependencies...");
         Command::new("cmd")
                 .args(["/C", &dev_dependencies]).output().expect("Failed to install dev dependencies");   
         println!("Dev dependencies installed successfully!");   
     } else {
 
-        println!("Installing dependencies...");
+        println!("\nInstalling dependencies...");
         Command::new("sh")
                 .arg("-c")
                 .arg(&dependencies)
                 .output().expect("Failed to install dependencies");
         println!("Dependencies installed successfully!");
 
-        println!("Installing dev dependencies...");
+        println!("\nInstalling dev dependencies...");
         Command::new("sh")
                 .arg("-c")
                 .arg(&dev_dependencies)

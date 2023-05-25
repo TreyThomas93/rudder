@@ -59,7 +59,7 @@ pub fn main_dart() -> String {
                         child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                                Text('Oops! Something went wrong.'),
+                                const Text('Oops! Something went wrong.'),
                                 Text(errorDetails.exception.toString())
                             ],
                         )
@@ -93,14 +93,14 @@ pub fn app_dart() -> String {
 
         import 'utils/routes.dart';
 
-        class MyApp extends StatefulWidget {
+        class MyApp extends ConsumerStatefulWidget {
             const MyApp({super.key});
 
             @override
-            State<MyApp> createState() => _MyAppState();
+            ConsumerState<MyApp> createState() => _MyAppState();
         }
 
-        class _MyAppState extends State<MyApp> {
+        class _MyAppState extends ConsumerState<MyApp> {
             late final AppRouter _appRouter;
 
             @override
@@ -275,7 +275,7 @@ pub fn extensions_dart() -> String {
     return "
         extension StringExtension on String {
             String capitalize() {
-                return '${this[0].toUpperCase()}${this.substring(1)}';
+                return '${this[0].toUpperCase()}${substring(1)}';
             }
         }
     ".trim().to_string();
@@ -297,9 +297,9 @@ pub fn stateless_widget(feature_name: &str) -> String {
             Widget build(BuildContext context) {{
                 return Scaffold(
                     appBar: AppBar(
-                        title: Text('{feature_name}'),
+                        title: const Text('{feature_name}'),
                     ),
-                    body: Center(
+                    body: const Center(
                         child: Text('{feature_name}'),
                     ),
                 );
@@ -488,7 +488,6 @@ pub fn controller(feature_name: &str) -> String {
 
             {feature_name}Controller(this.ref) : super(true);
 
-            @override
             Future<void> fetchSomething() async => throw UnimplementedError();
         }}
 
