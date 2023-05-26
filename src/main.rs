@@ -8,11 +8,14 @@ Basic folder structure for Flutter projects:
                 - application
                     > home_service.dart
                 - data
-                    > remote_repository.dart
-                    > local_repository.dart
+                    > fake_home_remote_repository.dart
+                    > fake_home_local_repository.dart
+                    > home_remote_repository.dart
+                    > home_local_repository.dart
                 - domain
-                    > home_model.dart
-                    > home_union.dart
+                    > home_models.dart
+                    > home_unions.dart
+                    > home_exceptions.dart
                 - presentation
                     > home_screen.dart
                     - controllers
@@ -26,19 +29,15 @@ Basic folder structure for Flutter projects:
             > routes.dart
             ...
 
+A .env file will be added to root of project folder as well. Used with the flutter_dotenv package.
+
 This is created when the following command is run: rudder create
 Must be in root of project folder to work correctly.
 
 Commands:
-rudder create - creates the basic folder structure for the project
-rudder add feature:[feature_name] - creates the folder structure for a feature
-
-Plan:
-- Add ability to create sub_features. (e.g. home -> home/sub_features/roster/sub_features/documents/...)
-- Add routes.dart to utils folder on create.
-- Update repo names to remote/local.
-- Add union file to domain folder.
-- Automatically add dart code to dart files.
+rudder create >> creates the basic folder structure for the project
+rudder add --features [feature_name] >> creates the folder structure for a feature
+rudder add --features [feature_name] --sub_feature [sub_feature_name] >> creates the folder structure for a sub feature. Must include --features flag (only one feature name allowed when creating a sub feature).
  */
 
 mod args;
