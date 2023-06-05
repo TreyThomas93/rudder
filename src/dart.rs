@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 pub trait StringTrait {
   fn capitalize(self) -> String;
   fn to_pascal_case(self) -> String;
