@@ -51,7 +51,6 @@ pub fn add_feature(feature_name: &str, sub_feature_name: Option<&str>) {
             "domain" => {
                 create_file(&path, &format!("{}_models.dart", feature_name), None);
                 create_file(&path, &format!("{}_unions.dart", feature_name), None);
-                create_file(&path, &format!("{}_exceptions.dart", feature_name), None);
             }
             "presentation" => {
                 create_file(&path, format!("{}_screen.dart", feature_name).as_str(), Some(stateless_widget(feature_name)));
@@ -83,39 +82,72 @@ pub fn create_project_structure() {
 
     let root = "lib";
 
+    let src = format!("{}\\src", &root);
+
+    // * MAIN.DART
     // create main.dart file
     create_file(root, "main.dart", Some(main_dart()));
 
+    // * SRC
     // create src folder
-    create_folder(format!("{}\\src", &root).as_str());
+    create_folder(&src);
 
+    // * APP.DART
     // create app.dart file
-    create_file(format!("{}\\src", &root).as_str(), "app.dart", Some(app_dart()));
+    create_file(&src, "app.dart", Some(app_dart()));
 
-    // create features folder
-    create_folder(format!("{}\\src\\features", &root).as_str());
+    // * SHARED WIDGETS
+    // create shared_widgets folder
+    create_folder(format!("{}\\shared_widgets", &src).as_str());
 
+    // * CONSTANTS
+    // create constants folder
+    create_folder(format!("{}\\constants", &src).as_str());
+    // create app_sizes.dart
+    create_file(format!("{}\\constants", &src).as_str(), "app_sizes.dart", Some(app_sizes()));
+    // create app_colors.dart
+    create_file(format!("{}\\constants", &src).as_str(), "app_colors.dart", Some(app_colors()));
+    // create app_text_styles.dart
+    create_file(format!("{}\\constants", &src).as_str(), "app_text_styles.dart", Some(app_text_styles()));
+
+    // * EXCEPTIONS
+    // create exceptions folder
+    create_folder(format!("{}\\exceptions", &src).as_str());
+    // create app_exceptions.dart
+    create_file(format!("{}\\exceptions", &src).as_str(), "app_exceptions.dart", Some(app_exceptions()));
+    // create async_errors.dart
+    create_file(format!("{}\\exceptions", &src).as_str(), "async_errors.dart", Some(async_errors()));
+
+    // * ROUTES
+    // create routes folder
+    create_folder(format!("{}\\routes", &src).as_str());
+    // create routes.dart file
+    create_file(format!("{}\\routes", &src).as_str(), "routes.dart", Some(routes_dart()));
+
+    // * UTILS
     // create utils folder
-    create_folder(format!("{}\\src\\utils", &root).as_str());
-
-    // create theme.dart file for utils folder
-    create_file(format!("{}\\src\\utils", &root).as_str(), "theme.dart", None);
-
-    // create routes.dart file for utils folder
-    create_file(format!("{}\\src\\utils", &root).as_str(), "routes.dart", Some(routes_dart()));
-
+    create_folder(format!("{}\\utils", &src).as_str());
+    // create theme.dart file
+    create_file(format!("{}\\utils", &src).as_str(), "theme.dart", None);
     // create an extension.dart file
-    create_file(format!("{}\\src\\utils", &root).as_str(), "extensions.dart", Some(extensions_dart()));
+    create_file(format!("{}\\utils", &src).as_str(), "extensions.dart", Some(extensions_dart()));
+    // create helper.dart file
+    create_file(format!("{}\\utils", &src).as_str(), "helper.dart", Some(helper_dart()));
+    
 
+    // * SERVICES
     // create services folder
-    create_folder(format!("{}\\src\\services", &root).as_str());
-
+    create_folder(format!("{}\\services", &src).as_str());
     // create logger_service.dart file
     create_file(
-        format!("{}\\src\\services", &root).as_str(),
+        format!("{}\\services", &src).as_str(),
         "logger_service.dart",
         Some(logger_service()),
     );
+
+    // * FEATURES
+    // create features folder
+    create_folder(format!("{}\\features", &src).as_str());
 
     // add home feature
     add_feature("home", None);

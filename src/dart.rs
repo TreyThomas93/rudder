@@ -1,4 +1,4 @@
-#![allow(dead_code)]
+#![allow(dead_code, unused)]
 
 pub trait StringTrait {
   fn capitalize(self) -> String;
@@ -52,7 +52,7 @@ pub fn main_dart() -> String {
             final container = ProviderContainer(overrides: [
                 loggerServiceProvider.overrideWith((ref) => LoggerService(ref)),
             ], observers: [
-                RiverPodLogger()
+                AsyncErrorLogger()
             ]);
 
             await container.read(loggerServiceProvider).init();
@@ -573,4 +573,180 @@ pub fn logger_service() -> String {
         }
             ".trim().to_string();
         
+    }
+
+    // async_errors.dart
+    pub fn async_errors() -> String {
+        return "
+            import '../app_exceptions.dart';
+            import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+            class AsyncErrorLogger extends ProviderObserver {
+
+                @override
+                void didUpdateProvider(
+                    ProviderBase provider,
+                    Object? previousValue,
+                    Object? newValue,
+                    ProviderContainer container,
+                ) {
+                    final logger = container.read(loggerServiceProvider);
+                    final error = _findError(newValue);
+                    if (error != null) {
+                        if (error.error is AppException) {
+                            logger.error(error: error.error as AppException, stackTrace: error.stackTrace, methodName: 'AsyncErrorLogger', sendToServer: false);
+
+                            // only prints the AppException data
+                            // errorLogger.logAppException(error.error as AppException);
+                        } else {
+                            logger.error(error: error.error, stackTrace: error.stackTrace, methodName: 'AsyncErrorLogger', sendToServer: true);
+                        }
+                    }
+                }
+
+                AsyncError<dynamic>? _findError(Object? value) {
+                    if (value is AsyncError) {
+                        return value;
+                    } else {
+                        return null;
+                    }
+                }
+            }
+        ".trim().to_string();
+    }
+
+    // app_exceptions.dart
+    pub fn app_exceptions() -> String {
+        return "
+            import 'package:freezed_annotation/freezed_annotation.dart';
+            part 'app_exceptions.freezed.dart';
+
+            @freezed
+            class AppException with _$AppException {
+                const factory AppException.invalidUsernamePassword(Object e) = InvalidUsernamePassword;
+            }
+
+            extension AppExceptionMessages on AppException {
+                String get message {
+                    return when(
+                        invalidUsernamePassword: () => 'Invalid username and/or password.',
+                    );
+                }
+                }
+        ".trim().to_string();
+    }
+
+    // app_sizes.dart
+    pub fn app_sizes() -> String {
+        return "
+            import 'package:flutter/material.dart';
+
+            /// Constant sizes to be used in the app (paddings, gaps, rounded corners etc.)
+            class Sizes {
+            static const p4 = 4.0;
+            static const p8 = 8.0;
+            static const p12 = 12.0;
+            static const p16 = 16.0;
+            static const p20 = 20.0;
+            static const p24 = 24.0;
+            static const p32 = 32.0;
+            static const p48 = 48.0;
+            static const p64 = 64.0;
+            }
+
+            /// Constant gap widths
+            const gapW4 = SizedBox(width: Sizes.p4);
+            const gapW8 = SizedBox(width: Sizes.p8);
+            const gapW12 = SizedBox(width: Sizes.p12);
+            const gapW16 = SizedBox(width: Sizes.p16);
+            const gapW20 = SizedBox(width: Sizes.p20);
+            const gapW24 = SizedBox(width: Sizes.p24);
+            const gapW32 = SizedBox(width: Sizes.p32);
+            const gapW48 = SizedBox(width: Sizes.p48);
+            const gapW64 = SizedBox(width: Sizes.p64);
+
+            /// Constant gap heights
+            const gapH4 = SizedBox(height: Sizes.p4);
+            const gapH8 = SizedBox(height: Sizes.p8);
+            const gapH12 = SizedBox(height: Sizes.p12);
+            const gapH16 = SizedBox(height: Sizes.p16);
+            const gapH20 = SizedBox(height: Sizes.p20);
+            const gapH24 = SizedBox(height: Sizes.p24);
+            const gapH32 = SizedBox(height: Sizes.p32);
+            const gapH48 = SizedBox(height: Sizes.p48);
+            const gapH64 = SizedBox(height: Sizes.p64);
+        ".trim().to_string();
+    }
+
+    // app_colors.dart
+    pub fn app_colors() -> String {
+        return "
+            import 'package:flutter/material.dart';
+            
+            /// App colors
+            abstract class AppColors {
+                static const darkBlue = Color(0xFF555E82);
+            }
+        ".trim().to_string();
+    }
+
+    // app_text_styles.dart
+    pub fn app_text_styles() -> String {
+        return "
+            import 'package:flutter/material.dart';
+
+            /// App TextStyles
+            abstract class AppTextStyles {
+                // Body styles /////////////////////////////////////////
+
+                /// fontSize: 16 fontWeight: FontWeight.w400 letterSpacing: 0.5
+                static const b1 = TextStyle(fontSize: 16, color: AppColors.kText, fontWeight: FontWeight.w400, letterSpacing: 0.5);
+
+                /// fontSize: 15 fontWeight: FontWeight.w400 letterSpacing: 0.5
+                static const b2 = TextStyle(fontSize: 15, color: AppColors.kText, fontWeight: FontWeight.w400, letterSpacing: 0.5);
+
+                /// fontSize: 14 fontWeight: FontWeight.w400 letterSpacing: 0.25
+                static const b3 = TextStyle(fontSize: 14, color: AppColors.kText, fontWeight: FontWeight.w400, letterSpacing: 0.25);
+
+                /// fontSize: 13 fontWeight: FontWeight.w400 letterSpacing: 0.25
+                static const b4 = TextStyle(fontSize: 13, color: AppColors.kText, fontWeight: FontWeight.w400, letterSpacing: 0.25);
+
+                /// fontSize: 12 fontWeight: FontWeight.w400 letterSpacing: 0.25
+                static const b5 = TextStyle(fontSize: 12, color: AppColors.kText, fontWeight: FontWeight.w400, letterSpacing: 0.25);
+
+                // Header styles /////////////////////////////////////////
+
+                /// fontSize: 24 fontWeight: FontWeight.w300 letterSpacing: 0.0
+                static const h1 = TextStyle(fontSize: 24, color: AppColors.kText, fontWeight: FontWeight.w300, letterSpacing: 0.0);
+
+                /// fontSize: 23 fontWeight: FontWeight.w300 letterSpacing: 0.0
+                static const h2 = TextStyle(fontSize: 23, color: AppColors.kText, fontWeight: FontWeight.w300, letterSpacing: 0.0);
+
+                /// fontSize: 22 fontWeight: FontWeight.w400 letterSpacing: 0.0
+                static const h3 = TextStyle(fontSize: 22, color: AppColors.kText, fontWeight: FontWeight.w400, letterSpacing: 0.0);
+
+                /// fontSize: 21 fontWeight: FontWeight.w400 letterSpacing: 0.15
+                static const h4 = TextStyle(fontSize: 21, color: AppColors.kText, fontWeight: FontWeight.w400, letterSpacing: 0.15);
+
+                /// fontSize: 20 fontWeight: FontWeight.w400 letterSpacing: 0.15
+                static const h5 = TextStyle(fontSize: 20, color: AppColors.kText, fontWeight: FontWeight.w400, letterSpacing: 0.15);
+
+                /// fontSize: 19 fontWeight: FontWeight.w500 letterSpacing: 0.15
+                static const h6 = TextStyle(fontSize: 19, color: AppColors.kText, fontWeight: FontWeight.w500, letterSpacing: 0.15);
+            }
+        ".trim().to_string();
+    }
+
+    // helper.dart
+    pub fn helper_dart() -> String {
+        return "
+            import 'dart:math';
+
+            abstract class Helper {
+                static int getRandomNumber(int min, int max) {
+                    final random = Random();
+                    return min + random.nextInt(max - min);
+                }
+            }
+        ".trim().to_string();
     }
